@@ -1,0 +1,115 @@
+#include <stdio.h>
+#include <limits.h>
+#include <stdbool.h>
+
+// Process structure
+typedef struct {
+    int id;
+    int burstTime;
+    int arrivalTime;
+    int priority;
+    bool executed;
+} Process;
+
+// Function to sort processes by arrival time
+void sortByArrivalTime(Process processes[], int n) {
+    for (int i = 0; i < n - 1; ++i) {
+        for (int j = 0; j < n - i - 1; ++j) {
+            if (processes[j].arrivalTime > processes[j + 1].arrivalTime) {
+                Process temp = processes[j];
+                processes[j] = processes[j + 1];
+                processes[j + 1] = temp;
+            }
+        }
+    }
+}
+
+// Function to sort processes by burst time
+void sortByBurstTime(Process processes[], int n) {
+    for (int i = 0; i < n - 1; ++i) {
+        for (int j = 0; j < n - i - 1; ++j) {
+            if (processes[j].burstTime > processes[j + 1].burstTime) {
+                Process temp = processes[j];
+                processes[j] = processes[j + 1];
+                processes[j + 1] = temp;
+            }
+        }
+    }
+}
+
+// Function to find the process with the highest priority
+int findHighestPriority(Process processes[], int n) {
+    int highestPriority = INT_MAX;
+    int index = -1;
+    for (int i = 0; i < n; ++i) {
+        if (!processes[i].executed && processes[i].priority < highestPriority) {
+            highestPriority = processes[i].priority;
+            index = i;
+        }
+    }
+    return index;
+}
+
+// Function to simulate FCFS scheduling
+void fcfs(Process processes[], int n) {
+    printf("FCFS Scheduling:\n");
+    int currentTime = 0;
+    for (int i = 0; i < n; ++i) {
+        currentTime += processes[i].burstTime;
+        printf("Process %d executed from time %d to %d\n", processes[i].id, currentTime - processes[i].burstTime, currentTime);
+    }
+}
+
+// Function to simulate SJF scheduling
+void sjf(Process processes[], int n) {
+    printf("\nSJF Scheduling:\n");
+    sortByBurstTime(processes, n);
+    int currentTime = 0;
+    for (int i = 0; i < n; ++i) {
+        currentTime += processes[i].burstTime;
+        printf("Process %d executed from time %d to %d\n", processes[i].id, currentTime - processes[i].burstTime, currentTime);
+    }
+}
+
+// Function to simulate Priority scheduling
+void priority(Process processes[], int n) {
+    printf("\nPriority Scheduling:\n");
+    int currentTime = 0;
+    for (int i = 0; i < n; ++i) {
+        int highestPriorityIndex = findHighestPriority(processes, n);
+        if (highestPriorityIndex != -1) {
+            currentTime += processes[highestPriorityIndex].burstTime;
+            printf("Process %d executed from time %d to %d\n", processes[highestPriorityIndex].id, currentTime - processes[highestPriorityIndex].burstTime, currentTime);
+            processes[highestPriorityIndex].executed = true;
+        }
+    }
+}
+
+int main() {
+    int n;
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+    Process processes[n];
+
+    // Input process details
+    for (int i = 0; i < n; ++i) {
+        processes[i].id = i + 1;
+        printf("Enter arrival time for process %d: ", i + 1);
+        scanf("%d", &processes[i].arrivalTime);
+        printf("Enter burst time for process %d: ", i + 1);
+        scanf("%d", &processes[i].burstTime);
+        printf("Enter priority for process %d: ", i + 1);
+        scanf("%d", &processes[i].priority);
+        processes[i].executed = false;
+    }
+
+    // Sort processes by arrival time
+    sortByArrivalTime(processes, n);
+
+    // Execute scheduling algorithms
+    fcfs(processes, n);
+    sjf(processes, n);
+    priority(processes, n);
+
+    return 0;
+}

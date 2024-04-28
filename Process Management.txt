@@ -1,0 +1,115 @@
+Process Management: Scheduling
+
+
+#include <stdio.h>
+
+// Structure to represent a process
+struct Process {
+    int id;         // Process ID
+    int arrival;    // Arrival time
+    int burst;      // Burst time
+    int priority;   // Priority (for preemptive scheduling)
+    int wait;       // Waiting time
+    int turn;       // Turnaround time
+};
+
+// Function to perform non-preemptive scheduling (FCFS)
+void non_preemptive_scheduling(struct Process processes[], int n) {
+    // Sort processes based on arrival time
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (processes[j].arrival > processes[j + 1].arrival) {
+                struct Process temp = processes[j];
+                processes[j] = processes[j + 1];
+                processes[j + 1] = temp;
+            }
+        }
+    }
+
+    // Calculate waiting and turnaround times
+    processes[0].wait = 0;
+    processes[0].turn = processes[0].burst;
+    for (int i = 1; i < n; i++) {
+        processes[i].wait = processes[i - 1].wait + processes[i - 1].burst;
+        processes[i].turn = processes[i].wait + processes[i].burst;
+    }
+
+    // Display scheduling results
+    printf("Non-Preemptive Scheduling (FCFS):\n");
+    printf("Process\tArrival\tBurst\tWait\tTurnaround\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t%d\t%d\t%d\t%d\n", processes[i].id, processes[i].arrival, processes[i].burst, processes[i].wait, processes[i].turn);
+    }
+}
+
+// Function to perform preemptive scheduling (SJF)
+void preemptive_scheduling(struct Process processes[], int n) {
+    int total_time = 0; // Total execution time
+    int done[n];        // Array to track completion status of processes
+    int current = -1;   // Index of currently executing process
+
+    // Initialize done array
+    for (int i = 0; i < n; i++) {
+        done[i] = 0;
+    }
+
+    printf("Preemptive Scheduling (SJF):\n");
+    printf("Time\tProcess\n");
+
+    // Loop until all processes are done
+    while (1) {
+        int shortest = -1;
+        int min_burst = 99999; // Some large value
+
+        // Find the shortest remaining burst time process
+        for (int i = 0; i < n; i++) {
+            if (!done[i] && processes[i].arrival <= total_time && processes[i].burst < min_burst) {
+                shortest = i;
+                min_burst = processes[i].burst;
+            }
+        }
+
+        // If no process is found, exit loop
+        if (shortest == -1) {
+            break;
+        }
+
+        // Execute the selected process for 1 time unit
+        printf("%d\tP%d\n", total_time, processes[shortest].id);
+        processes[shortest].burst--;
+        total_time++;
+
+        // If burst time becomes 0, mark process as done and calculate waiting and turnaround time
+        if (processes[shortest].burst == 0) {
+            done[shortest] = 1;
+            processes[shortest].wait = total_time - processes[shortest].arrival - processes[shortest].turn;
+            processes[shortest].turn = total_time - processes[shortest].arrival;
+        }
+    }
+
+    // Display scheduling results
+    printf("Process\tArrival\tBurst\tWait\tTurnaround\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t%d\t%d\t%d\t%d\n", processes[i].id, processes[i].arrival, processes[i].burst + 1, processes[i].wait, processes[i].turn);
+    }
+}
+
+int main() {
+    // Define processes
+    struct Process processes[] = {
+        {1, 0, 5, 0, 0, 0},
+        {2, 1, 3, 0, 0, 0},
+        {3, 2, 8, 0, 0, 0},
+        {4, 3, 6, 0, 0, 0},
+        {5, 4, 4, 0, 0, 0}
+    };
+    int n = sizeof(processes) / sizeof(processes[0]);
+
+    // Perform non-preemptive scheduling (FCFS)
+    non_preemptive_scheduling(processes, n);
+
+    // Perform preemptive scheduling (SJF)
+    preemptive_scheduling(processes, n);
+
+    return 0;
+}

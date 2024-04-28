@@ -1,0 +1,109 @@
+Memory Management: Virtual Memory (Page Replacement Policies - FIFO, LRU):
+
+#include <stdio.h>
+
+#define NUM_FRAMES 3
+#define NUM_PAGES 10
+
+int frames[NUM_FRAMES];
+int pages[NUM_PAGES];
+int page_faults = 0;
+
+void fifo() {
+    int fifo_queue[NUM_FRAMES];
+    int front = 0, rear = -1;
+    int frame_index = 0;
+
+    printf("FIFO Page Replacement Algorithm:\n");
+    for (int i = 0; i < NUM_PAGES; ++i) {
+        int page = pages[i];
+        int is_page_fault = 1;
+
+        // Check if page already in frame
+        for (int j = 0; j < NUM_FRAMES; ++j) {
+            if (frames[j] == page) {
+                is_page_fault = 0;
+                break;
+            }
+        }
+
+        if (is_page_fault) {
+            if (rear < NUM_FRAMES - 1) {
+                rear++;
+            } else {
+                rear = 0;
+            }
+            fifo_queue[rear] = page;
+            frames[frame_index] = page;
+            frame_index = (frame_index + 1) % NUM_FRAMES;
+            page_faults++;
+        }
+
+        printf("Page %d: ", page);
+        for (int j = 0; j <= rear; ++j) {
+            printf("%d ", fifo_queue[j]);
+        }
+        printf("\n");
+    }
+
+    printf("Total Page Faults (FIFO): %d\n", page_faults);
+}
+
+void lru() {
+    int lru_counters[NUM_FRAMES];
+    for (int i = 0; i < NUM_FRAMES; ++i) {
+        lru_counters[i] = 0;
+    }
+
+    printf("LRU Page Replacement Algorithm:\n");
+    for (int i = 0; i < NUM_PAGES; ++i) {
+        int page = pages[i];
+        int is_page_fault = 1;
+
+        // Check if page already in frame
+        for (int j = 0; j < NUM_FRAMES; ++j) {
+            if (frames[j] == page) {
+                is_page_fault = 0;
+                lru_counters[j] = i + 1; // Update counter with current time
+                break;
+            }
+        }
+
+        if (is_page_fault) {
+            int lru_index = 0, min_counter = lru_counters[0];
+            for (int j = 1; j < NUM_FRAMES; ++j) {
+                if (lru_counters[j] < min_counter) {
+                    min_counter = lru_counters[j];
+                    lru_index = j;
+                }
+            }
+
+            frames[lru_index] = page;
+            lru_counters[lru_index] = i + 1; // Update counter with current time
+            page_faults++;
+        }
+
+        printf("Page %d: ", page);
+        for (int j = 0; j < NUM_FRAMES; ++j) {
+            printf("%d ", frames[j]);
+        }
+        printf("\n");
+    }
+
+    printf("Total Page Faults (LRU): %d\n", page_faults);
+}
+
+int main() {
+    // Initialize frames and pages
+    printf("Enter reference string (length %d): ", NUM_PAGES);
+    for (int i = 0; i < NUM_PAGES; ++i) {
+        scanf("%d", &pages[i]);
+    }
+
+    // Simulate page replacement using each algorithm
+    fifo();
+    printf("\n");
+    lru();
+
+    return 0;
+}

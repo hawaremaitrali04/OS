@@ -1,0 +1,102 @@
+Memory Management: Dynamic Partitioning Placement Algorithms (Best Fit, First Fit, Worst Fit):
+
+
+#include <stdio.h>
+
+#define NUM_PARTITIONS 5
+#define NUM_PROCESSES 5
+
+int partitions[NUM_PARTITIONS];
+int processes[NUM_PROCESSES];
+
+void best_fit() {
+    int allocation[NUM_PROCESSES] = {0};
+    for (int i = 0; i < NUM_PROCESSES; ++i) {
+        int best_index = -1;
+        for (int j = 0; j < NUM_PARTITIONS; ++j) {
+            if (partitions[j] >= processes[i]) {
+                if (best_index == -1 || partitions[j] < partitions[best_index]) {
+                    best_index = j;
+                }
+            }
+        }
+        if (best_index != -1) {
+            allocation[i] = 1;
+            partitions[best_index] -= processes[i];
+        }
+    }
+    printf("Best Fit Allocation:\n");
+    for (int i = 0; i < NUM_PROCESSES; ++i) {
+        if (allocation[i]) {
+            printf("Process %d allocated to partition\n", i);
+        } else {
+            printf("Process %d not allocated\n", i);
+        }
+    }
+}
+
+void first_fit() {
+    int allocation[NUM_PROCESSES] = {0};
+    for (int i = 0; i < NUM_PROCESSES; ++i) {
+        for (int j = 0; j < NUM_PARTITIONS; ++j) {
+            if (partitions[j] >= processes[i]) {
+                allocation[i] = 1;
+                partitions[j] -= processes[i];
+                break;
+            }
+        }
+    }
+    printf("First Fit Allocation:\n");
+    for (int i = 0; i < NUM_PROCESSES; ++i) {
+        if (allocation[i]) {
+            printf("Process %d allocated to partition\n", i);
+        } else {
+            printf("Process %d not allocated\n", i);
+        }
+    }
+}
+
+void worst_fit() {
+    int allocation[NUM_PROCESSES] = {0};
+    for (int i = 0; i < NUM_PROCESSES; ++i) {
+        int worst_index = -1;
+        for (int j = 0; j < NUM_PARTITIONS; ++j) {
+            if (partitions[j] >= processes[i]) {
+                if (worst_index == -1 || partitions[j] > partitions[worst_index]) {
+                    worst_index = j;
+                }
+            }
+        }
+        if (worst_index != -1) {
+            allocation[i] = 1;
+            partitions[worst_index] -= processes[i];
+        }
+    }
+    printf("Worst Fit Allocation:\n");
+    for (int i = 0; i < NUM_PROCESSES; ++i) {
+        if (allocation[i]) {
+            printf("Process %d allocated to partition\n", i);
+        } else {
+            printf("Process %d not allocated\n", i);
+        }
+    }
+}
+
+int main() {
+    // Initialize partitions and processes
+    for (int i = 0; i < NUM_PARTITIONS; ++i) {
+        printf("Enter size of partition %d: ", i);
+        scanf("%d", &partitions[i]);
+    }
+    for (int i = 0; i < NUM_PROCESSES; ++i) {
+        printf("Enter size of process %d: ", i);
+        scanf("%d", &processes[i]);
+    }
+
+    // Perform memory allocation using each algorithm
+    best_fit();
+    first_fit();
+    worst_fit();
+
+    return 0;
+}

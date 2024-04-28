@@ -1,0 +1,32 @@
+Linux Commands and System Calls:
+
+
+mkdir my_directory
+cd my_directory
+echo "Hello, world!" > my_file.txt
+ls
+whoami
+logname
+
+# System Calls
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+int main() {
+    pid_t pid = getpid();
+    pid_t ppid = getppid();
+    uid_t uid = getuid();
+    gid_t gid = getgid();
+    uid_t euid = geteuid();
+    gid_t egid = getegid();
+
+    printf("Process ID: %d\n", pid);
+    printf("Parent Process ID: %d\n", ppid);
+    printf("User ID: %d\n", uid);
+    printf("Group ID: %d\n", gid);
+    printf("Effective User ID: %d\n", euid);
+    printf("Effective Group ID: %d\n", egid);
+
+    return 0;
+}

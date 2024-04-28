@@ -1,0 +1,65 @@
+System calls:
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+int main() {
+    // Example of open, read, write, close system calls
+    int fd = open("example.txt", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+    if (fd == -1) {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
+
+    char buffer[100];
+    ssize_t bytes_read = read(fd, buffer, sizeof(buffer));
+    if (bytes_read == -1) {
+        perror("read");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    ssize_t bytes_written = write(STDOUT_FILENO, buffer, bytes_read);
+    if (bytes_written == -1) {
+        perror("write");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    close(fd);
+
+    // Example of getpid system call
+    pid_t pid = getpid();
+    printf("Process ID: %d\n", pid);
+
+    // Example of getuid system call
+    uid_t uid = getuid();
+    printf("User ID: %d\n", uid);
+
+    // Example of getgid system call
+    gid_t gid = getgid();
+    printf("Group ID: %d\n", gid);
+
+    // Example of geteuid system call
+    uid_t euid = geteuid();
+    printf("Effective User ID: %d\n", euid);
+
+    // Example of getegid system call
+    gid_t egid = getegid();
+    printf("Effective Group ID: %d\n", egid);
+
+    // Example of sorting using system call sort
+    system("sort example.txt > sorted_example.txt");
+
+    // Example of using grep to search for a pattern
+    system("grep 'pattern' example.txt");
+
+    // Example of using awk to process text
+    system("awk '{print $1}' example.txt");
+
+    return 0;
+}
